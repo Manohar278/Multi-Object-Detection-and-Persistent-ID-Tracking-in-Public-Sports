@@ -1,9 +1,5 @@
 streamlit
 opencv-python-headless
-ultralytics
 numpy
-<<<<<<< HEAD
-torch --index-url https://download.pytorch.org/whl/cpu
-=======
 torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
->>>>>>> c875766 (save local changes)
+ultralytics==8.0.196
