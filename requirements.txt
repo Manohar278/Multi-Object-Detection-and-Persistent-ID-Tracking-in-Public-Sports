@@ -1,5 +1,4 @@
 streamlit
 opencv-python-headless
 numpy
-torch==2.0.1+cpu --index-url https://download.pytorch.org/whl/cpu
 ultralytics
