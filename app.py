@@ -1,13 +1,13 @@
 import streamlit as st
 import cv2
 import os
+import subprocess
 from ultralytics import YOLO
 
 st.set_page_config(page_title="Object Tracking App", layout="wide")
 st.title("⚽ Multi-Object Detection & Tracking")
 
 VIDEO_PATH = "foot ball.mp4"
-OUTPUT_PATH = "output_tracked.mp4"
 
 st.video(VIDEO_PATH)
 
@@ -29,9 +29,11 @@ if st.button("🚀 Start Tracking"):
     fps          = cap.get(cv2.CAP_PROP_FPS) or 30
     OUT_W, OUT_H = 960, 540
 
-    raw_path = "raw_tracked.mp4"
-    fourcc   = cv2.VideoWriter_fourcc(*"mp4v")
-    writer   = cv2.VideoWriter(raw_path, fourcc, fps, (OUT_W, OUT_H))
+    raw_path    = "/tmp/raw_tracked.mp4"
+    output_path = "/tmp/output_tracked.mp4"
+
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    writer = cv2.VideoWriter(raw_path, fourcc, fps, (OUT_W, OUT_H))
 
     progress_bar  = st.progress(0)
     status_text   = st.empty()
@@ -105,26 +107,25 @@ if st.button("🚀 Start Tracking"):
     cap.release()
     writer.release()
 
-    status_text.text("🔄 Re-encoding to H.264 for browser playback...")
-    ret = os.system(f"ffmpeg -y -i {raw_path} -vcodec libx264 -pix_fmt yuv420p -crf 23 -preset fast {OUTPUT_PATH}")
+    status_text.text("🔄 Re-encoding for browser playback...")
 
-    if ret != 0 or not os.path.exists(OUTPUT_PATH) or os.path.getsize(OUTPUT_PATH) == 0:
-        OUTPUT_PATH_FINAL = raw_path
-    else:
-        OUTPUT_PATH_FINAL = OUTPUT_PATH
+    subprocess.run([
+        "ffmpeg", "-y",
+        "-i", raw_path,
+        "-vcodec", "libx264",
+        "-pix_fmt", "yuv420p",
+        "-movflags", "+faststart",
+        "-crf", "23",
+        "-preset", "fast",
+        output_path
+    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     progress_bar.progress(1.0)
     status_text.text(f"✅ Done! Processed {frame_count} frames.")
-    st.success("✅ Tracking complete! Download or watch below 👇")
+    st.success("✅ Tracking complete!")
 
-    with open(OUTPUT_PATH_FINAL, "rb") as f:
+    final = output_path if os.path.exists(output_path) and os.path.getsize(output_path) > 0 else raw_path
+    with open(final, "rb") as f:
         video_bytes = f.read()
 
-    st.download_button(
-        label="⬇️ Download Tracked Video",
-        data=video_bytes,
-        file_name="tracked_output.mp4",
-        mime="video/mp4"
-    )
-
-    st.video(OUTPUT_PATH_FINAL)
+    st.video(video_bytes, format="video/mp4")
