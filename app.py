@@ -5,7 +5,7 @@ from ultralytics import YOLO
 st.set_page_config(page_title="Object Tracking App", layout="wide")
 st.title("⚽ Multi-Object Detection & Tracking")
 
-VIDEO_PATH = "foot_ball.mp4"
+VIDEO_PATH = "foot ball.mp4"
 
 st.video(VIDEO_PATH)
 
