@@ -2,14 +2,11 @@ import streamlit as st
 import cv2
 from ultralytics import YOLO
 
-# Page config
 st.set_page_config(page_title="Object Tracking App", layout="wide")
-
 st.title("⚽ Multi-Object Detection & Tracking")
 
-VIDEO_PATH = "foot ball.mp4"  # rename file (no spaces)
+VIDEO_PATH = "foot ball.mp4"  # no spaces!
 
-# Show preview
 st.video(VIDEO_PATH)
 
 if st.button("🚀 Start Tracking"):
